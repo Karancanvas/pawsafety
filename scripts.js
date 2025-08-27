@@ -100,7 +100,7 @@ function donate(amount) {
 
 // Contact functions
 function openWhatsApp() {
-    window.open('https://wa.me/919876543210?text=Hello%20Paw%20Safety!%20I%20would%20like%20to%20help.', '_blank');
+    window.open('https://wa.me/918386818441?text=Hello%20Paw%20Safety!%20I%20would%20like%20to%20help.', '_blank');
 }
 
 function openEmail() {
@@ -108,10 +108,47 @@ function openEmail() {
 }
 
 // Form handlers
-function handleContactForm(e) {
+async function handleContactForm(e) {
     e.preventDefault();
-    alert('Thank you for your message! 🐾\n\nWe\'ve received your inquiry and will get back to you within 24 hours. Your support means the world to us!');
-    e.target.reset();
+
+    // Get form elements
+    const form = e.target;
+    const name = document.getElementById("contact-name").value;
+    const email = document.getElementById("contact-email").value;
+    const phone = document.getElementById("contact-phone").value;
+    const subject = form.querySelector("select").value;
+    const message = document.getElementById("contact-message").value;
+
+    const data = {
+        name: name,
+        email: email,
+        phone: phone,
+        subject: subject,
+        message: message
+    };
+
+    try {
+        const res = await fetch("http://localhost:5001/contact", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+            alert('Thank you for your message! 🐾\n\nWe\'ve received your inquiry and will get back to you within 24 hours. Your support means the world to us!');
+            form.reset();
+        } else {
+            alert("⚠️ Failed to send your message: " + (result.message || "Please try again."));
+        }
+    } catch (err) {
+        console.error("Frontend error:", err);
+        alert("⚠️ Error sending your message. Please check your connection and try again.");
+    }
 }
 
 function handleNewsletterSignup(e) {
